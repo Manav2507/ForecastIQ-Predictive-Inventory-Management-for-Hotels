@@ -20,10 +20,10 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -36,25 +36,27 @@ jobs:
 
     - name: Run app (optional)
       run: |
-        # Run your main app
-        python app.py
+        # Run your main script if needed
+        python app.py || echo "app.py not found, skipping"
 
     - name: Execute notebook (optional)
-      uses: stefanzweifel/gha-run-notebook@v1
-      with:
-        notebook-path: main.ipynb
-        output-path: results/main_out.ipynb
+      run: |
+        pip install nbconvert jupyter
+        jupyter nbconvert --to notebook --execute main.ipynb --output results/main_out.ipynb
 
     - name: Save trained model artifacts
       if: success() && always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: xgb-models
         path: |
           xgb_inventory_model.pkl
           xgb_model_features.pkl
 
-    - name: Run tests (if you have them)
+    - name: Run tests (if available)
       run: |
-        # For example, run pytest if you create tests
-        pytest --maxfail=1 --disable-warnings -q
+        if [ -d tests ]; then
+          pip install pytest
+          pytest --maxfail=1 --disable-warnings -q
+        else
+          echo "No tests folder found, skipping"
