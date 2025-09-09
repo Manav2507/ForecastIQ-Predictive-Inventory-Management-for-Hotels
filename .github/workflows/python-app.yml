@@ -61,3 +61,4 @@ jobs:
           pytest --maxfail=1 --disable-warnings -q
         else
           echo "No tests folder found, skipping"
+        fi
