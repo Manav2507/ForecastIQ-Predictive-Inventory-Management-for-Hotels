@@ -42,8 +42,9 @@ jobs:
     - name: Execute notebook (optional)
       run: |
         pip install nbconvert jupyter
+        mkdir -p results
         jupyter nbconvert --to notebook --execute main.ipynb --output results/main_out.ipynb
-
+    
     - name: Save trained model artifacts
       if: success() && always()
       uses: actions/upload-artifact@v4
